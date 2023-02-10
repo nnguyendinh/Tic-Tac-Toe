@@ -102,6 +102,10 @@ export default function Game() {
 
   function jumpTo(nextMove) {
     setCurrentMove(nextMove)
+    if (nextMove < 6)
+      setXIsNext(nextMove % 2 === 0);
+    else 
+      setXIsNext(Math.floor(nextMove / 2) % 2 === 1);
   }
 
   const moves = history.map((squares, move) => {

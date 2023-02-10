@@ -12,19 +12,27 @@ function Square({ value, onSquareClick }) {
   );
 }
 
-function Board({ xIsNext, squares, onPlay }) {
+function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferring }) {
   const winner = calculateWinner(squares)
   let status
   if (winner) 
     status = "Winner: " + winner
   else 
-    status = "Next player: " + (xIsNext ? "X" : "O")
+    status = "Next player: " + (xIsNext ? "X" : "O") + "Status: " + (xIsMaxed ? "Maxed" : "Nah")
 
   function handleClick(i) {
     if (squares[i] || calculateWinner(squares))
       return
     const nextSquares = squares.slice()
-    if (xIsNext) {
+    if (xIsNext && xIsMaxed && !transferring) { // If squares is maxed out, select which one to switch
+      nextSquares[i] = '?'
+      setTransferring(true)
+    }
+    else if (xIsNext && xIsMaxed && transferring) {  // switch it
+      setTransferring(false)
+      nextSquares[i] = 'yay'
+    }
+    else if (xIsNext) {
       nextSquares[i] = 'X'
     }
     else {
@@ -61,10 +69,19 @@ export default function Game() {
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
 
+  // Nathan Code
+  const [xIsMaxed, setXIsMaxed] = useState(false);
+  const [oIsMaxed, setOIsMaxed] = useState(false);
+  const [transferring, setTransferring] = useState(false);
+  const [trasnferSource, setTransferSource] = useState(null);
+
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
+    if (currentMove > 2) {
+      setXIsMaxed(true)
+    }
   }
 
   function jumpTo(nextMove) {
@@ -90,7 +107,7 @@ export default function Game() {
   return (
     <div className="game">
       <div className="game-board">
-        <Board xIsNext = {xIsNext} squares = {currentSquares} onPlay = {handlePlay} />
+        <Board xIsMaxed = {xIsMaxed} transferring = {transferring} xIsNext = {xIsNext} squares = {currentSquares} onPlay = {handlePlay} setTransferring = {setTransferring} />
       </div>
       <div className="game-info">
         <ol>{moves}</ol>

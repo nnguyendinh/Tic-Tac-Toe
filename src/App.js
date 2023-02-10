@@ -37,6 +37,18 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
     if (transferring && !isAdjacent(j + 1, i + 1))
       return
 
+    if (xIsMaxed && !transferring) {
+      let move_possible = false
+      for (let k = 0; k < 9; k++) {
+        if (squares[k] == null && isAdjacent(i + 1, k + 1)) {
+          move_possible = true
+        }
+      }
+      if (!move_possible)
+        return
+
+    }
+
     const nextSquares = squares.slice()
     if (xIsMaxed) {
       if (!transferring) {  // Fill old spot with '?'
@@ -116,10 +128,11 @@ export default function Game() {
       setXIsMaxed(false)
       setXIsNext(nextMove % 2 === 0);
     }
-    else 
+    else  {
       setTransferring(nextMove % 2 === 1)
       setXIsMaxed(true)
       setXIsNext(Math.floor(nextMove / 2) % 2 === 1);
+    }
   }
 
   const moves = history.map((squares, move) => {

@@ -30,6 +30,28 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
     if (xIsMaxed && !transferring && ((xIsNext && squares[i] != 'X') || !xIsNext && squares[i] != 'O'))
       return
 
+    // if (xIsMaxed && !transferring && xIsNext && squares[4] == 'X') {
+    //   console.log("checking win possibility");
+    //   let win_possible = false
+    //   for (let k = 0; k < 9; k++) {
+    //     if (squares[k] == null) {
+    //       const posSquares = squares.slice()
+    //       posSquares[4] = null
+    //       posSquares[k] = 'X'
+    //       if (calculateWinner(posSquares)) {
+    //         win_possible = true
+    //         console.log("Win possible");
+    //       }
+    //     }
+    //   }
+    // }
+
+    if (xIsMaxed && !transferring && xIsNext && squares[4] == 'X' && i != 4)
+      return
+
+    if (xIsMaxed && !transferring && !xIsNext && squares[4] == 'O' && i != 4)
+      return
+
     let j;
     for (let k = 0; k < 9; k++) 
       if (squares[k] == '?') 

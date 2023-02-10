@@ -30,6 +30,13 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
     if (xIsMaxed && !transferring && ((xIsNext && squares[i] != 'X') || !xIsNext && squares[i] != 'O'))
       return
 
+    let j;
+    for (let k = 0; k < 9; k++) 
+      if (squares[k] == '?') 
+        j = k;
+    if (transferring && !isAdjacent(j + 1, i + 1))
+      return
+
     const nextSquares = squares.slice()
     if (xIsMaxed) {
       if (!transferring) {  // Fill old spot with '?'
@@ -39,9 +46,9 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
       else {  // Set 'X' or 'O' in new spot and remove the '?'
         setTransferring(false)  
         nextSquares[i] = (xIsNext ? 'X' : 'O')
-        for (let i = 0; i < 9; i++) 
-          if (nextSquares[i] == '?') 
-            nextSquares[i] = null
+        for (let k = 0; k < 9; k++) 
+          if (nextSquares[k] == '?') 
+            nextSquares[k] = null
       }
     }
     else {  // Do regular tic-tac-toe
@@ -86,9 +93,11 @@ export default function Game() {
   const [transferring, setTransferring] = useState(false);
 
   function handlePlay(nextSquares) {
-    if (currentMove > 4) {
+    if (currentMove >= 5) {
       setXIsMaxed(true)
     }
+    else 
+      setXIsMaxed(false)
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
@@ -102,9 +111,14 @@ export default function Game() {
 
   function jumpTo(nextMove) {
     setCurrentMove(nextMove)
-    if (nextMove < 6)
+    if (nextMove < 6) {
+      setTransferring(false)
+      setXIsMaxed(false)
       setXIsNext(nextMove % 2 === 0);
+    }
     else 
+      setTransferring(nextMove % 2 === 1)
+      setXIsMaxed(true)
       setXIsNext(Math.floor(nextMove / 2) % 2 === 1);
   }
 
@@ -134,6 +148,53 @@ export default function Game() {
       </div>
     </div>
   )
+}
+
+function isAdjacent(orgin, dest) {
+  switch(orgin) {
+    case 1: 
+      if (dest == 2 || dest == 4 || dest == 5)
+        return true
+      else  
+        return false
+    case 2: 
+      if (dest == 1 || dest == 3 || dest == 4 || dest == 5 || dest == 6)
+        return true
+      else  
+        return false
+    case 3: 
+      if (dest == 2 || dest == 5 || dest == 6)
+        return true
+      else  
+        return false
+    case 4: 
+    if (dest == 1 || dest == 2 || dest == 5 || dest == 7 || dest == 8)
+      return true
+    else  
+      return false
+    case 5: return true
+    case 6: 
+      if (dest == 2 || dest == 3 || dest == 5 || dest == 8 || dest == 9)
+        return true
+      else  
+        return false
+    case 7: 
+      if (dest == 4 || dest == 5 || dest == 8)
+        return true
+      else  
+        return false
+    case 8: 
+      if (dest == 4 || dest == 5 || dest == 6 || dest == 7 || dest == 9)
+        return true
+      else  
+        return false
+    case 9: 
+      if (dest == 5 || dest == 6 || dest == 8)
+        return true
+      else  
+        return false
+  }
+
 }
 
 function calculateWinner(squares) {

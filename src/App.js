@@ -100,12 +100,26 @@ export default function Game() {
     setXIsNext(!xIsNext)
   }
 
+  // function jumpTo(nextMove) {
+  //   setCurrentMove(nextMove)
+  //   if (nextMove < 6)
+  //     setXIsNext(nextMove % 2 === 0);
+  //   else 
+  //     setXIsNext(Math.floor(nextMove / 2) % 2 === 1);
+  // }
+
   function jumpTo(nextMove) {
     setCurrentMove(nextMove)
-    if (nextMove < 6)
+    if (nextMove < 6) {
+      setTransferring(false)
+      setXIsMaxed(false)
       setXIsNext(nextMove % 2 === 0);
-    else 
+    }
+    else {
+      setTransferring(nextMove % 2 === 1)
+      setXIsMaxed(true)
       setXIsNext(Math.floor(nextMove / 2) % 2 === 1);
+    }
   }
 
   const moves = history.map((squares, move) => {

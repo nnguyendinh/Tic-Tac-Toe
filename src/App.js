@@ -21,7 +21,7 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
     status = "Next player: " + (xIsNext ? "X" : "O") + "Status: " + (xIsMaxed ? "Maxed" : "Nah")
 
   function handleClick(i) {
-    if (squares[i] || calculateWinner(squares))
+    if (/*squares[i] || */calculateWinner(squares))
       return
     const nextSquares = squares.slice()
     if (xIsNext && xIsMaxed && !transferring) { // If squares is maxed out, select which one to switch
@@ -30,7 +30,12 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
     }
     else if (xIsNext && xIsMaxed && transferring) {  // switch it
       setTransferring(false)
-      nextSquares[i] = 'yay'
+      nextSquares[i] = 'X'
+      for (let i = 0; i < 9; i++) {
+        if (nextSquares[i] == '?') {
+          nextSquares[i] = null
+        }
+      }
     }
     else if (xIsNext) {
       nextSquares[i] = 'X'

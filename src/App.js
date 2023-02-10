@@ -18,19 +18,36 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
   if (winner) 
     status = "Winner: " + winner
   else 
-    status = "Next player: " + (xIsNext ? "X" : "O") + "Status: " + (xIsMaxed ? "Maxed" : "Nah")
+    status = "Next player: " + (xIsNext ? "X" : "O") + "Maxed?: " + (xIsMaxed ? "Maxed" : "Nah") + "T?" + (transferring ? "Y": "N")
 
   function handleClick(i) {
-    if (/*squares[i] || */calculateWinner(squares))
+    if (calculateWinner(squares))
+      return
+    if (!xIsMaxed && squares[i] && !transferring)  // If we are still filling blank squares and we chose a non-blank
+      return
+    if (xIsNext && transferring && squares[i])  // If we are transferring and we choose a non-blank (TODO)
       return
     const nextSquares = squares.slice()
-    if (xIsNext && xIsMaxed && !transferring) { // If squares is maxed out, select which one to switch
+    // if (xIsNext && xIsMaxed && !transferring) { // If squares is maxed out, select which one to switch
+    //   nextSquares[i] = '?'
+    //   setTransferring(true)
+    // }
+    // else if (xIsNext && xIsMaxed && transferring) {  // switch it
+    //   setTransferring(false)
+    //   nextSquares[i] = 'X'
+    //   for (let i = 0; i < 9; i++) {
+    //     if (nextSquares[i] == '?') {
+    //       nextSquares[i] = null
+    //     }
+    //   }
+    // }
+    if (xIsMaxed && !transferring) {
       nextSquares[i] = '?'
       setTransferring(true)
     }
-    else if (xIsNext && xIsMaxed && transferring) {  // switch it
+    else if (xIsMaxed && transferring) {
       setTransferring(false)
-      nextSquares[i] = 'X'
+      nextSquares[i] = (xIsNext ? 'X' : 'O')
       for (let i = 0; i < 9; i++) {
         if (nextSquares[i] == '?') {
           nextSquares[i] = null
@@ -71,22 +88,26 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
 export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
-  const xIsNext = currentMove % 2 === 0;
+  const [xIsNext, setXIsNext] = useState(true);
   const currentSquares = history[currentMove];
 
   // Nathan Code
   const [xIsMaxed, setXIsMaxed] = useState(false);
-  const [oIsMaxed, setOIsMaxed] = useState(false);
   const [transferring, setTransferring] = useState(false);
-  const [trasnferSource, setTransferSource] = useState(null);
 
   function handlePlay(nextSquares) {
+    if (currentMove > 4) {
+      setXIsMaxed(true)
+    }
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
-    if (currentMove > 2) {
-      setXIsMaxed(true)
+    for (let i = 0; i < 9; i++) {
+      if (nextSquares[i] == '?') {
+        return
+      }
     }
+    setXIsNext(!xIsNext)
   }
 
   function jumpTo(nextMove) {

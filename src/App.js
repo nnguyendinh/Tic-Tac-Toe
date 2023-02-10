@@ -23,42 +23,32 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
   function handleClick(i) {
     if (calculateWinner(squares))
       return
-    if (!xIsMaxed && squares[i] && !transferring)  // If we are still filling blank squares and we chose a non-blank
+    if (!xIsMaxed && squares[i])  // If we are still filling blank squares and we chose a non-blank
       return
-    if (xIsNext && transferring && squares[i])  // If we are transferring and we choose a non-blank (TODO)
+    if (transferring && squares[i])  // If we are transferring and we choose a non-blank
       return
+    if (xIsMaxed && !transferring && ((xIsNext && squares[i] != 'X') || !xIsNext && squares[i] != 'O'))
+      return
+
     const nextSquares = squares.slice()
-    // if (xIsNext && xIsMaxed && !transferring) { // If squares is maxed out, select which one to switch
-    //   nextSquares[i] = '?'
-    //   setTransferring(true)
-    // }
-    // else if (xIsNext && xIsMaxed && transferring) {  // switch it
-    //   setTransferring(false)
-    //   nextSquares[i] = 'X'
-    //   for (let i = 0; i < 9; i++) {
-    //     if (nextSquares[i] == '?') {
-    //       nextSquares[i] = null
-    //     }
-    //   }
-    // }
-    if (xIsMaxed && !transferring) {
-      nextSquares[i] = '?'
-      setTransferring(true)
-    }
-    else if (xIsMaxed && transferring) {
-      setTransferring(false)
-      nextSquares[i] = (xIsNext ? 'X' : 'O')
-      for (let i = 0; i < 9; i++) {
-        if (nextSquares[i] == '?') {
-          nextSquares[i] = null
-        }
+    if (xIsMaxed) {
+      if (!transferring) {  // Fill old spot with '?'
+        nextSquares[i] = '?'
+        setTransferring(true)
+      }
+      else {  // Set 'X' or 'O' in new spot and remove the '?'
+        setTransferring(false)  
+        nextSquares[i] = (xIsNext ? 'X' : 'O')
+        for (let i = 0; i < 9; i++) 
+          if (nextSquares[i] == '?') 
+            nextSquares[i] = null
       }
     }
-    else if (xIsNext) {
-      nextSquares[i] = 'X'
-    }
-    else {
-      nextSquares[i] = 'O'
+    else {  // Do regular tic-tac-toe
+      if (xIsNext)
+        nextSquares[i] = 'X'
+      else
+        nextSquares[i] = 'O'
     }
     onPlay(nextSquares)
   }

@@ -20,46 +20,31 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
   else 
     status = "Next player: " + (xIsNext ? "X" : "O") + "Maxed?: " + (xIsMaxed ? "Maxed" : "Nah") + "T?" + (transferring ? "Y": "N")
 
-  function handleClick(i) {
-    if (calculateWinner(squares))
-      return
+  function validInput(i) {  // All cases where an invalid input is detected (returns false)
+
+    if (calculateWinner(squares)) // Game is already won
+      return false
     if (!xIsMaxed && squares[i])  // If we are still filling blank squares and we chose a non-blank
-      return
+      return false
     if (transferring && squares[i])  // If we are transferring and we choose a non-blank
-      return
-    if (xIsMaxed && !transferring && ((xIsNext && squares[i] != 'X') || !xIsNext && squares[i] != 'O'))
-      return
+      return false
+    if (xIsMaxed && !transferring && ((xIsNext && squares[i] != 'X') || !xIsNext && squares[i] != 'O')) // if we are
+      return false
+    if (xIsMaxed && !transferring && xIsNext && squares[4] == 'X' && i != 4)  // If it is X's turn, there is an X in the middle, and we chose non-middle
+      return false
+    if (xIsMaxed && !transferring && !xIsNext && squares[4] == 'O' && i != 4) // If it is O's turn, there is an O in the middle, and we chose non-middle
+      return false
 
-    // if (xIsMaxed && !transferring && xIsNext && squares[4] == 'X') {
-    //   console.log("checking win possibility");
-    //   let win_possible = false
-    //   for (let k = 0; k < 9; k++) {
-    //     if (squares[k] == null) {
-    //       const posSquares = squares.slice()
-    //       posSquares[4] = null
-    //       posSquares[k] = 'X'
-    //       if (calculateWinner(posSquares)) {
-    //         win_possible = true
-    //         console.log("Win possible");
-    //       }
-    //     }
-    //   }
-    // }
-
-    if (xIsMaxed && !transferring && xIsNext && squares[4] == 'X' && i != 4)
-      return
-
-    if (xIsMaxed && !transferring && !xIsNext && squares[4] == 'O' && i != 4)
-      return
-
-    let j;
+    // If we are transferring and we choose a non-adjacent to the original
+    let j;  
     for (let k = 0; k < 9; k++) 
       if (squares[k] == '?') 
         j = k;
     if (transferring && !isAdjacent(j + 1, i + 1))
-      return
+      return false
 
-    if (xIsMaxed && !transferring) {
+    // If we are choosing a piece to transfer and it has no adjacent blank squares
+    if (xIsMaxed && !transferring) {  
       let move_possible = false
       for (let k = 0; k < 9; k++) {
         if (squares[k] == null && isAdjacent(i + 1, k + 1)) {
@@ -67,10 +52,18 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
         }
       }
       if (!move_possible)
-        return
-
+        return false
     }
 
+    return true // If none of the cases return false
+
+  }
+
+  function handleClick(i) {
+
+    if (!validInput(i))
+      return
+  
     const nextSquares = squares.slice()
     if (xIsMaxed) {
       if (!transferring) {  // Fill old spot with '?'

@@ -18,7 +18,7 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
   if (winner) 
     status = "Winner: " + winner
   else 
-    status = "Next player: " + (xIsNext ? "X" : "O") + "Maxed?: " + (xIsMaxed ? "Maxed" : "Nah") + "T?" + (transferring ? "Y": "N")
+    status = "Next player: " + (xIsNext ? "X" : "O")
 
   function validInput(i) {  // All cases where an invalid input is detected (returns false)
 
@@ -28,7 +28,7 @@ function Board({ xIsMaxed, transferring, xIsNext, squares, onPlay, setTransferri
       return false
     if (transferring && squares[i])  // If we are transferring and we choose a non-blank
       return false
-    if (xIsMaxed && !transferring && ((xIsNext && squares[i] != 'X') || !xIsNext && squares[i] != 'O')) // if we are
+    if (xIsMaxed && !transferring && ((xIsNext && squares[i] != 'X') || !xIsNext && squares[i] != 'O')) // if we are not filling blanks and choose a square that's not ours to move 
       return false
     if (xIsMaxed && !transferring && xIsNext && squares[4] == 'X' && i != 4)  // If it is X's turn, there is an X in the middle, and we chose non-middle
       return false
